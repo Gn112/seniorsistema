@@ -9,3 +9,5 @@ from django.shortcuts import render
 def home(request):
     return render(request, 'candidato/home.html')
 
+def candidatos(request):
+    pass

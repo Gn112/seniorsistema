@@ -24,4 +24,5 @@ urlpatterns = [
     # rota -> view -> nome ref
 
     path('', views.home, name='home'),
+    path('candidatos/', views.candidatos, name='listagem_candidatos')
 ]
