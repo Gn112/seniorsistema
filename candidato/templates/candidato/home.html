@@ -17,15 +17,47 @@
         </div>
     </nav>
 
-    <form class="m-5" action="{% url 'listagem_candidatos' %}" method="post">
-        <h2>Cadastra para a vaga X</h2>
+    <form class="m-5" action="{% url 'candidatos' %}" method="post">
+        {% csrf_token %}
+        <h2>Cadastro Candidato</h2>
         <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="input-email" name="email">
+            <label for="nome" class="form-label">Nome</label>
+            <input name="nome" type="text" class="form-control" id="input-email">
         </div>
         <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input name="email" type="email" class="form-control" id="input-email">
+        </div>
+
+        <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="input-senha" name="senha">
+            <input name="senha" type="password" class="form-control" id="input-senha">
+        </div>
+
+        <div class="mb-3">
+            <label for="idade" class="form-label">idade</label>
+            <input name="idade" type="text" class="form-control" id="input-idade">
+        </div>
+
+        <div class="mb-3">
+          <div class="form-floating">
+            <select name="ult_escolaridade" class="form-select" id="floatingSelectGrid" aria-label="Floating label select example">
+              <option selected></option>
+              <option value="1">Ensino fundamental</option>
+              <option value="2">Ensino médio</option>
+              <option value="3">Tecnólogo</option>
+              <option value="4">Ensino Superior</option>
+              <option value="5">Pós / MBA / Mestrado</option>
+              <option value="6">Doutorado</option>
+            </select>
+            <label for="floatingSelectGrid">Selecione sua Escolaridade:</label>
+          </div>
+        </div>
+
+        <label for="floatingTextarea2">Experiência</label>
+        <div class="form-floating mb-3">
+          <textarea name="experiencia" class="form-control" placeholder="null" id="floatingTextarea2" style="height: 100px" maxlength="500"></textarea>
+          <label for="floatingTextarea2">Diga sua experiência</label>
         </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
     </form>
