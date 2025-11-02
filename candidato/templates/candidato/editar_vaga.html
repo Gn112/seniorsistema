@@ -1,0 +1,13 @@
+{% extends 'candidato/base.html' %}
+{% block conteudo %}
+
+<form class="m-5" method="post">
+    {% csrf_token %}
+    <h2>Editando Vaga: {{ formulario.instance.nome_vaga }}</h2>
+
+    {{ formulario.as_p }}
+
+    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+</form>
+
+{% endblock %}

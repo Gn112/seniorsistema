@@ -1,0 +1,139 @@
+{% extends 'candidato/base.html' %}
+{% block conteudo %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="m-5">
+    <h2>Dashboard</h2>
+    <p>Olá, {{ request.user.email }}!</p>
+
+    {% if request.user.user_type == 'empresa' %}
+        <p>
+            <a href="{% url 'criar_vaga' %}" class="btn btn-success">+ Criar Nova Vaga</a>
+            </p>
+    {% endif %}
+    {% if request.user.user_type == 'candidato' %}
+        <p><a href="{% url 'editar_perfil' %}" class="btn btn-info">Editar Meu Perfil</a></p>
+    {% endif %}
+
+    <div class="row">
+
+        {% if request.user.user_type == 'empresa' %}
+        <div class="col-md-4">
+            <h4>Relatórios</h4>
+            
+            <p class="mt-4"><strong>Vagas Criadas por Mês</strong></p>
+            <canvas id="graficoVagas"></canvas>
+
+            <hr class="my-4">
+
+            <p class="mt-4"><strong>Candidatos Recebidos por Mês</strong></p>
+            <canvas id="graficoCandidatos"></canvas>
+        </div>
+        {% endif %}
+
+        {% if request.user.user_type == 'empresa' %}
+        <div class="col-md-8">
+        {% else %}
+        <div class="col-md-12">
+        {% endif %}
+        
+            <h4>Vagas</h4>
+            
+            {% for vaga in vagas %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ vaga.nome_vaga }}</h5>
+                    <p class="card-text">Requisitos: {{ vaga.requisitos }}</p>
+                    <p>
+                      <strong>Total de Candidatos: {{ vaga.applications.count }}</strong>
+                    </p>
+    
+                    {% if request.user == vaga.empresa %}
+                        <p>
+                            <a href="{% url 'editar_vaga' vaga.id %}" class="btn btn-warning">Editar</a>
+                            <a href="{% url 'deletar_vaga' vaga.id %}" class="btn btn-danger">Deletar</a>
+                        </p>
+                        
+                        <h6>Candidatos Inscritos:</h6>
+                        
+                        {% for aplicacao in vaga.applications.all %}
+                        {% with candidato=aplicacao.candidato perfil=aplicacao.candidato.perfilcandidato %}
+                            
+                            {% if perfil.pretensao_salarial == vaga.faixa_salarial and perfil.ultima_escolaridade >= vaga.escolaridade_minima %}
+                                <div class="card p-2 mb-2" style="background-color: #d4edda; border: 1px solid #c3e6cb;">
+                                    <strong style="float: right;">Pontuação: 2</strong>
+                            {% elif perfil.pretensao_salarial == vaga.faixa_salarial or perfil.ultima_escolaridade >= vaga.escolaridade_minima %}
+                                <div class="card p-2 mb-2" style="background-color: #fff3cd; border: 1px solid #ffeeba;">
+                                    <strong style="float: right;">Pontuação: 1</strong>
+                            {% else %}
+                                <div class="card p-2 mb-2">
+                                    <strong style="float: right;">Pontuação: 0</strong>
+                            {% endif %}
+                            
+                                <strong>Email: {{ candidato.email }}</strong>
+                                <small>
+                                  Experiência: {{ perfil.experiencia|default:"Não preenchido" }} <br>
+                                  Escolaridade: {{ perfil.get_ultima_escolaridade_display|default:"Não preenchido" }} <br>
+                                  Pretensão Salarial: {{ perfil.get_pretensao_salarial_display|default:"Não preenchido" }}
+                                </small>
+                            </div> 
+                        {% endwith %}
+                        {% empty %}
+                            <p><small>Nenhum candidato inscrito nesta vaga ainda.</small></p>
+                        {% endfor %}
+
+                    {% else %}
+                        <a href="{% url 'candidatar_vaga' vaga.id %}" class="btn btn-primary">
+                            Candidatar-se
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+                <p>Nenhuma vaga encontrada.</p>
+            {% endfor %}
+            </div> </div> <p class="mt-5">
+      <a href="{% url 'home' %}">Sair (Logout)</a>
+    </p>
+</div>
+
+
+{% if request.user.user_type == 'empresa' %}
+<script>
+    // --- Dados do Gráfico 1 (Vagas) ---
+    const vagasLabels = {{ vagas_labels|safe }};
+    const vagasData = {{ vagas_data|safe }};
+
+    new Chart(document.getElementById('graficoVagas'), {
+        type: 'bar',
+        data: {
+            labels: vagasLabels,
+            datasets: [{
+                label: 'Nº de Vagas',
+                data: vagasData,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            }]
+        }
+    });
+
+    // --- Dados do Gráfico 2 (Candidatos) ---
+    const candidatosLabels = {{ candidatos_labels|safe }};
+    const candidatosData = {{ candidatos_data|safe }};
+
+    new Chart(document.getElementById('graficoCandidatos'), {
+        type: 'line',
+        data: {
+            labels: candidatosLabels,
+            datasets: [{
+                label: 'Nº de Candidatos',
+                data: candidatosData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false
+            }]
+        }
+    });
+</script>
+{% endif %}
+
+{% endblock %}

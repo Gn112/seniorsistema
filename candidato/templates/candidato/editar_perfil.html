@@ -1,0 +1,14 @@
+{% extends 'candidato/base.html' %}
+{% block conteudo %}
+
+<form class="m-5" method="post">
+    {% csrf_token %}
+    <h2>Editar Perfil</h2>
+    <p>Complete suas informações para poder se candidatar.</p>
+
+    {{ formulario.as_p }}
+
+    <button type="submit" class="btn btn-primary">Salvar Perfil</button>
+</form>
+
+{% endblock %}
